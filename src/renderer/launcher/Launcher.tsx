@@ -1,6 +1,6 @@
 import React from "react";
 
-const App: React.FC = () => {
+const Launcher: React.FC = () => {
   return (
     <div>
       <h1>Simple DAW Launcher</h1>
@@ -12,4 +12,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+export default Launcher;
