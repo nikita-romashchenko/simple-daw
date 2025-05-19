@@ -14,7 +14,7 @@ const __dirname = dirname(__filename);
 
 const createWindow = () => {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  const launcherWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
@@ -22,17 +22,55 @@ const createWindow = () => {
     },
   });
 
-  // and load the index.html of the app.
-  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
+  const dawWindow = new BrowserWindow({
+    width: 800,
+    height: 600,
+    webPreferences: {
+      preload: join(__dirname, "preload.js"),
+    },
+  });
+
+  if (DAW_VITE_DEV_SERVER_URL) {
+    console.log("Environment variables:", {
+      DAW_VITE_DEV_SERVER_URL,
+      DAW_VITE_NAME,
+      __dirname,
+    });
+    const url = `${DAW_VITE_DEV_SERVER_URL}/daw/index.html`;
+    console.log("Loading from dev server:", url);
+    dawWindow.loadURL(url);
   } else {
-    mainWindow.loadFile(
-      join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
-    );
+    const filePath = join(__dirname, "../dist/renderer/daw.html");
+    console.log("Loading from file:", filePath);
+    dawWindow.loadFile(filePath);
+  }
+
+  // and load the index.html of the app.
+  if (LAUNCHER_VITE_DEV_SERVER_URL) {
+    console.log("Environment variables:", {
+      LAUNCHER_VITE_DEV_SERVER_URL,
+      LAUNCHER_VITE_NAME,
+      __dirname,
+    });
+    const url = `${LAUNCHER_VITE_DEV_SERVER_URL}/launcher/index.html`;
+    console.log("Loading from dev server:", url);
+    launcherWindow.loadURL(url);
+  } else {
+    const filePath = join(__dirname, "../dist/renderer/launcher.html");
+    console.log("Loading from file:", filePath);
+    launcherWindow.loadFile(filePath);
   }
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  launcherWindow.webContents.openDevTools();
+
+  // Log any loading errors
+  launcherWindow.webContents.on(
+    "did-fail-load",
+    (event, errorCode, errorDescription) => {
+      console.error("Failed to load:", errorCode, errorDescription);
+    }
+  );
 };
 
 // This method will be called when Electron has finished
